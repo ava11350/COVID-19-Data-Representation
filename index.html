@@ -1,0 +1,324 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>COVID-19 Data</title>
+  <meta name="description" content="COVID-19 Data Represntation">
+  <meta name="author" content="Ava Smith">
+  
+  <link href="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+  <style>
+      .mdc-tab__text-label{
+          font-family: Monospace, Courier New;
+          font-weight:bold;
+          font-size:40px;
+      }
+      
+  </style> 
+    
+</head>
+
+<body>
+    
+    <div class="mdc-tab-bar" role="tablist">
+      <div class="mdc-tab-scroller">
+        <div class="mdc-tab-scroller__scroll-area mdc-tab-scroller__scroll-area--scroll">
+          <div class="mdc-tab-scroller__scroll-content">
+            <button class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" id="CountryTab" href="#CountrySelection" tabindex="0">
+              <span class="mdc-tab__content">
+                <!-- <span class="mdc-tab__icon material-icons" aria-hidden="true">countries</span> -->
+                <span class="mdc-tab__text-label">Countries</span>
+              </span>
+              <span class="mdc-tab-indicator mdc-tab-indicator--active">
+                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+              </span>
+              <span class="mdc-tab__ripple"></span>
+            </button>
+            <button class="mdc-tab" role="tab" aria-selected="false" id="TablesTab" href="#DataTables" tabindex="0">
+              <span class="mdc-tab__content">
+                <!-- <span class="mdc-tab__icon material-icons" aria-hidden="true">data tables</span> -->
+                <span class="mdc-tab__text-label">Data Tables</span>
+              </span>
+              <span class="mdc-tab-indicator">
+                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+              </span>
+              <span class="mdc-tab__ripple"></span>
+            </button>
+            <button class="mdc-tab" role="tab" aria-selected="false" id="ChartsTab" href="#ChartedData" tabindex="0">
+              <span class="mdc-tab__content">
+                <!-- <span class="mdc-tab__icon material-icons" aria-hidden="true">data charts</span> -->
+                <span class="mdc-tab__text-label">Data Charts</span>
+              </span>
+              <span class="mdc-tab-indicator">
+                <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+              </span>
+              <span class="mdc-tab__ripple"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="view" id="CountrySelection">
+        <input class="mdc-text-field__input" list="Countries" id="InputCountries" placeholder="Select Country">
+
+        <datalist id="Countries">
+          <!--<option value="Internet Explorer">-->
+        </datalist>
+
+        <button class="mdc-button foo-button" id="CountryButton">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">Add Country</span>
+        </button>
+        <button class="mdc-button foo-button" id="ChartButton">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">Draw Chart</span>
+        </button>
+
+        <ul class="mdc-list" id="SelectedCountries">
+          <!--<li class="mdc-list-item" tabindex="0">
+            <span class="mdc-list-item__text">Single-line item</span>
+          </li>
+            <li class="mdc-list-item">
+                <span class="mdc-list-item__text">Single-line item</span>
+                <span class="mdc-list-item__meta material-icons">clear</span>
+            </li> -->
+        </ul>
+    </div>
+    
+    <div class="view" id="DataTables">
+        
+    </div>
+    
+    <div class="view" id="ChartedData">
+        <button class="mdc-button foo-button" id="ChartButton2">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">Draw Chart</span>
+        </button>
+        
+        <canvas id="myChart"></canvas>
+    </div>
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script>
+        mdc.ripple.MDCRipple.attachTo(document.querySelector('.foo-button'));
+        
+        /* Initialization */
+        document.querySelector("#DataTables").style.display="none";
+        document.querySelector("#ChartedData").style.display="none";
+        
+        /* Gets the list of Countries and Data*/
+        let targetEndpoint = "https://pomber.github.io/covid19/timeseries.json";
+        let datamember = document.getElementById("Countries");  
+        let countryData;
+        fetch(targetEndpoint)
+            .then(response => {return response.json()})
+            .then(json => {
+                countryData = json;
+                for(const prop in json){
+                    let a = `${prop}`;
+                    let b = document.createElement("option");
+                    b.value = a;
+                    datamember.appendChild(b);                    
+                }
+            })
+            .catch(err => alert(err))
+        
+        /* Handles the Country Input */
+        let countryButton = document.getElementById("CountryButton");
+        let countryList = document.getElementById("SelectedCountries");
+        countryButton.addEventListener('click',event => {
+            if(document.getElementById("InputCountries").value!='')
+            {
+                let a = document.querySelector("input").value;
+                let d = document.querySelectorAll("option");
+                for(let i=0; i<d.length;i++){
+                    if(d[i].value==a)
+                        {
+                            d[i].disabled = true;
+                            
+                            let b = document.createElement("li");
+                            let c = document.createElement("span");
+                            let e = document.createElement("span");
+
+                            b.className = "mdc-list-item";
+                            c.className = "mdc-list-item__text";
+                            e.className = "mdc-list-item__meta material-icons";
+                            c.textContent = a;
+                            e.textContent = "clear";
+                            b.appendChild(c);
+                            b.appendChild(e);
+                            countryList.appendChild(b);
+                            
+                            document.getElementById("InputCountries").value = '';
+                            
+                            b.addEventListener('click', event => {
+                                for(let i=0; i<d.length;i++){
+                                    if(d[i].value==a)
+                                        {
+                                            d[i].disabled=false;
+                                        }
+                                }
+                                b.remove();
+                            })
+                        }
+                }
+            }
+        })
+        
+        /* Handles Top Tab Bar */
+        document.querySelectorAll("div.mdc-tab-bar button.mdc-tab").forEach(item => {
+            item.addEventListener('click', event => {
+                document.querySelectorAll("div.mdc-tab-bar button.mdc-tab").forEach(item => {
+                    let a = item.getAttribute("href");
+                    let b = document.querySelector(a);
+                    b.style.display = "none";
+                    
+                    let e = item.querySelector("span.mdc-tab-indicator");
+                    e.className = "mdc-tab-indicator";
+                    item.className = "mdc-tab";
+                });
+                
+                let c = item.getAttribute("href");
+                let d = document.querySelector(c);
+                d.style.display="block";
+                
+                let f = item.querySelector("span.mdc-tab-indicator");
+                f.className = "mdc-tab-indicator mdc-tab-indicator--active";
+                item.className = "mdc-tab mdc-tab--active";
+            })
+        })
+        
+        /* Country view Draw Chart button handler */
+        document.querySelector("div.view #ChartButton").addEventListener('click', event => {
+                
+                // Changes tab to Charts
+                let item = document.querySelector("div.mdc-tab-bar #ChartsTab"); 
+                document.querySelectorAll("div.mdc-tab-bar button.mdc-tab").forEach(item => {
+                    let a = item.getAttribute("href");
+                    let b = document.querySelector(a);
+                    b.style.display = "none";
+                    
+                    let e = item.querySelector("span.mdc-tab-indicator");
+                    e.className = "mdc-tab-indicator";
+                    item.className = "mdc-tab";
+                });
+                
+                let c = item.getAttribute("href");
+                let d = document.querySelector(c);
+                d.style.display="block";
+                
+                let f = item.querySelector("span.mdc-tab-indicator");
+                f.className = "mdc-tab-indicator mdc-tab-indicator--active";
+                item.className = "mdc-tab mdc-tab--active";
+            
+                // Renders the chart
+                drawChart();
+        })
+        
+        /* Data Charts Tab Bar draw chart handler */
+        /* This will draw the chart every time the charts tab is selected */
+        document.querySelector("div.mdc-tab-bar #ChartsTab").addEventListener('click', event => {
+            drawChart();
+        })
+        
+        let chartData;
+        /* Function for drawing a chart of data */
+        const drawChart = () => {
+            let a = document.querySelectorAll("div.view datalist option");
+            chartData = {
+                        labels: [],
+                        datasets: []
+            };
+            countryData["US"].forEach(day => {
+                chartData.labels.push(day.date);
+            })
+            // for the list of options
+            a.forEach(item => {
+                if(item.disabled == true)
+                {
+                    let b = countryData[item.value];
+                    let dataset = {
+                        label: item.value,
+                        //backgroundColor: 'rgb(255,50,50)',
+                        borderColor: 'rgb(255,20,20)',
+                        deaths: [],
+                        recovered: [],
+                        // data is confirmed 
+                        data: []
+                    };
+                    
+                    b.forEach(day => {
+                        dataset.deaths.push(day.deaths);
+                        dataset.recovered.push(day.recovered);
+                        dataset.data.push(day.confirmed);
+                    })
+
+                    chartData.datasets.push(dataset);
+                    console.log(b);                   
+                    
+                    chartData.datasets.forEach(ds => {
+                        if(ds.label == item.value)
+                        {
+                            //console.log(item.value);
+                            console.log("ok");
+                        }       
+                    });
+                    
+                    canvasDraw(chartData);
+                    //console.log(item.value);
+                }
+            })
+            
+        }
+        
+        pizza = {
+                        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                        datasets: [{
+                            label: 'My First dataset',
+                            backgroundColor: 'rgb(255, 99, 132)',
+                            //borderColor: 'rgb(255, 99, 132)',
+                            data: [0, 10, 5, 2, 20, 30, 45]
+                        }]
+        };
+        
+        /* Canvas Setup for Chartjs */
+        const canvasDraw = (data) => {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                // The type of chart we want to create
+                type: 'line',
+
+                // The data for our dataset
+                data,
+
+                // Configuration options go here
+                options: {
+                    layout: {
+                        padding: {
+                            bottom: 50
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    animation: {
+                        duration: 0
+                    },
+                    hover: {
+                        animationDuration: 0
+                    },
+                    responsiveAnimationDuration: 0
+                }
+            });
+        }
+        
+    </script>
+</body>
+</html>
