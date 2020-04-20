@@ -485,28 +485,29 @@
                     }
                 })
                 
-                if(deathCheck.checked)
-                {
-                    let deathStat = document.createElement("td");
-                    deathStat.className = "mdc-data-table__cell mdc-data-table__cell--numeric";
-                    deathStat.textContent = deathTotal;
-                    row.appendChild(deathStat);
-                }
-                
-                if(recoverCheck.checked)
-                {
-                    let recoverStat = document.createElement("td");
-                    recoverStat.className = "mdc-data-table__cell mdc-data-table__cell--numeric";
-                    recoverStat.textContent = recoverTotal;
-                    row.appendChild(recoverStat);
-                }
-                
                 if(worldCheck.checked)
                 {
+                    if(deathCheck.checked)
+                    {
+                        let deathStat = document.createElement("td");
+                        deathStat.className = "mdc-data-table__cell mdc-data-table__cell--numeric";
+                        deathStat.textContent = deathTotal;
+                        row.appendChild(deathStat);
+                    }
+
+                    if(recoverCheck.checked)
+                    {
+                        let recoverStat = document.createElement("td");
+                        recoverStat.className = "mdc-data-table__cell mdc-data-table__cell--numeric";
+                        recoverStat.textContent = recoverTotal;
+                        row.appendChild(recoverStat);
+                    }
+
                     let worldStat = document.createElement("td");
                     worldStat.className = "mdc-data-table__cell mdc-data-table__cell--numeric";
                     worldStat.textContent = worldTotal;
                     row.appendChild(worldStat);
+                    
                 }
                 
                 a.appendChild(row);
