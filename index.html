@@ -75,13 +75,13 @@
           <div class="mdc-button__ripple"></div>
           <span class="mdc-button__label">Add Country</span>
         </button>
-        <button class="mdc-button foo-button" id="ChartButton">
-          <div class="mdc-button__ripple"></div>
-          <span class="mdc-button__label">Draw Chart</span>
-        </button>
         <button class="mdc-button foo-button" id="TableButton">
           <div class="mdc-button__ripple"></div>
           <span class="mdc-button__label">Draw Table</span>
+        </button>
+        <button class="mdc-button foo-button" id="ChartButton">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">Draw Chart</span>
         </button>
 
         <ul class="mdc-list" id="SelectedCountries">
@@ -305,11 +305,11 @@
             let x = a.querySelector("tr");
             a.removeChild(x);
             
-            let deathCheck = document.getElementById("deathCheck").checked;
+            let deathCheck = document.getElementById("deathCheck");
             let deathTotal = 0;
-            let recoverCheck = document.getElementById("recoveredCheck").checked;
+            let recoverCheck = document.getElementById("recoveredCheck");
             let recoverTotal = 0;
-            let worldCheck = document.getElementById("worldCheck").checked;
+            let worldCheck = document.getElementById("worldCheck");
             let worldTotal = 0;
             
             let b = document.querySelectorAll("div.view datalist option");
@@ -326,22 +326,64 @@
             b.forEach(item => {
                 if(item.disabled == true)
                 {
+                    if(deathCheck.checked)
+                    {
+                        let headElemDeath = document.createElement("th");
+                        headElemDeath.setAttribute("role","columnheader");
+                        headElemDeath.setAttribute("scope","col");
+                        headElemDeath.className = "mdc-data-table__header-cell mdc-data-table__header-cell--numeric";
+                        headElemDeath.textContent = item.value + " Deaths";
+                        headRow.appendChild(headElemDeath);    
+                    }
+                    
+                    if(recoverCheck.checked)
+                    {
+                        let headElemRecov = document.createElement("th");
+                        headElemRecov.setAttribute("role","columnheader");
+                        headElemRecov.setAttribute("scope","col");
+                        headElemRecov.className = "mdc-data-table__header-cell mdc-data-table__header-cell--numeric";
+                        headElemRecov.textContent = item.value + " Recovered";
+                        headRow.appendChild(headElemRecov);    
+                    }
+                    
                     let headElem = document.createElement("th");
                     headElem.setAttribute("role","columnheader");
                     headElem.setAttribute("scope","col");
                     headElem.className = "mdc-data-table__header-cell mdc-data-table__header-cell--numeric";
-                    headElem.textContent = item.value;
-                    headRow.appendChild(headElem);                    
+                    headElem.textContent = item.value + " Confirmed";
+                    headRow.appendChild(headElem);                  
                 }
             })
             
-            if(worldCheck)
+            if(worldCheck.checked)
             {
+                if(deathCheck.checked)
+                {
+                    let headRowWorldDeath = document.createElement("th");
+                    headRowWorldDeath.setAttribute("role","columnheader");
+                    headRowWorldDeath.setAttribute("scope","col");
+                    headRowWorldDeath.className = "mdc-data-table__header-cell mdc-data-table__header-cell--numeric";
+                    headRowWorldDeath.textContent = "Worldwide Death Total";
+                    headRow.appendChild(headRowWorldDeath);
+                }
+                
+                if(recoverCheck.checked)
+                {
+                    let headRowWorldRecov = document.createElement("th");
+                    headRowWorldRecov.setAttribute("role","columnheader");
+                    headRowWorldRecov.setAttribute("scope","col");
+                    headRowWorldRecov.className = "mdc-data-table__header-cell mdc-data-table__header-cell--numeric";
+                    headRowWorldRecov.textContent = "Worldwide Recovered Total";
+                    headRow.appendChild(headRowWorldRecov);
+                }
+                
                 let headRowWorld = document.createElement("th");
                 headRowWorld.setAttribute("role","columnheader");
                 headRowWorld.setAttribute("scope","col");
                 headRowWorld.className = "mdc-data-table__header-cell mdc-data-table__header-cell--numeric";
-                head.
+                headRowWorld.textContent = "Worldwide Confirmed Total";
+                headRow.appendChild(headRowWorld);
+                
             }
             
             
@@ -360,24 +402,112 @@
                 let entry = document.createElement("td");
                 entry.className="mdc-data-table__cell";
                 entry.textContent=item.date;
-                row.appendChild(entry);
+                row.appendChild(entry);                
+                
+                worldTotal = 0;
+                recoverTotal = 0;
+                deathTotal = 0;                
                 
                 b.forEach(item => {
                     if(item.disabled == true)
                     {
                         let stats = document.createElement("td");
                         stats.className = "mdc-data-table__cell mdc-data-table__cell--numeric";
+                        
+                        let deathCountry = document.createElement("td");
+                        deathCountry.className = "mdc-data-table__cell mdc-data-table__cell--numeric";
+                        
+                        let recoverCountry = document.createElement("td");
+                        recoverCountry.className = "mdc-data-table__cell mdc-data-table__cell--numeric";
+                        
                         countryData[item.value].forEach(date => {
                             if(date.date == entry.textContent)
                             {
                                 stats.textContent = date.confirmed;
+                                worldTotal += date.confirmed;
+                                recoverTotal += date.recovered;
+                                deathTotal += date.deaths;
+                                
+                                if(deathCheck.checked)
+                                {
+                                    deathCountry.textContent = date.deaths;
+                                }
+                                
+                                if(recoverCheck.checked)
+                                {
+                                    recoverCountry.textContent = date.recovered;
+                                }
                             }
                         })
+                        
+                        if(deathCheck.checked)
+                        {
+                            row.appendChild(deathCountry);
+                        }
+                        
+                        if(recoverCheck.checked)
+                        {
+                            row.appendChild(recoverCountry);
+                        }
+                        
                         row.appendChild(stats);
+                        
+                        /* if(deathCheck.checked)
+                        {
+                            let headElemDeath = document.createElement("th");
+                            headElemDeath.setAttribute("role","columnheader");
+                            headElemDeath.setAttribute("scope","col");
+                            headElemDeath.className = "mdc-data-table__header-cell mdc-data-table__header-cell--numeric";
+                            headElemDeath.textContent = item.value + " Deaths";
+                            headRow.appendChild(headElemDeath);    
+                        }
+
+                        if(recoverCheck.checked)
+                        {
+                            let headElemRecov = document.createElement("th");
+                            headElemRecov.setAttribute("role","columnheader");
+                            headElemRecov.setAttribute("scope","col");
+                            headElemRecov.className = "mdc-data-table__header-cell mdc-data-table__header-cell--numeric";
+                            headElemRecov.textContent = item.value + " Recovered";
+                            headRow.appendChild(headElemRecov);    
+                        }
+
+                        let headElem = document.createElement("th");
+                        headElem.setAttribute("role","columnheader");
+                        headElem.setAttribute("scope","col");
+                        headElem.className = "mdc-data-table__header-cell mdc-data-table__header-cell--numeric";
+                        headElem.textContent = item.value + " Confirmed";
+                        headRow.appendChild(headElem); */     
+                        
+                        
+                        
+                        
                     }
                 })
                 
+                if(deathCheck.checked)
+                {
+                    let deathStat = document.createElement("td");
+                    deathStat.className = "mdc-data-table__cell mdc-data-table__cell--numeric";
+                    deathStat.textContent = deathTotal;
+                    row.appendChild(deathStat);
+                }
                 
+                if(recoverCheck.checked)
+                {
+                    let recoverStat = document.createElement("td");
+                    recoverStat.className = "mdc-data-table__cell mdc-data-table__cell--numeric";
+                    recoverStat.textContent = recoverTotal;
+                    row.appendChild(recoverStat);
+                }
+                
+                if(worldCheck.checked)
+                {
+                    let worldStat = document.createElement("td");
+                    worldStat.className = "mdc-data-table__cell mdc-data-table__cell--numeric";
+                    worldStat.textContent = worldTotal;
+                    row.appendChild(worldStat);
+                }
                 
                 a.appendChild(row);
             })
