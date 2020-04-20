@@ -565,6 +565,14 @@
         /* Function for drawing a chart of data */
         const drawChart = () => {
             let a = document.querySelectorAll("div.view datalist option");
+            
+            let x = document.getElementById("ChartedData");
+            let y = x.querySelector("canvas");
+            x.removeChild(y);
+            y = document.createElement("canvas");
+            y.setAttribute("id", "myChart");
+            x.appendChild(y);
+            
             chartData = {
                         labels: [],
                         datasets: []
